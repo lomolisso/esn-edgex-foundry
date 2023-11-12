@@ -1,0 +1,41 @@
+Writable:
+  LogLevel: "INFO"
+  StoreAndForward:
+    Enabled: false
+  Pipeline:
+    PerTopicPipelines:
+      randnum:
+        Id: randnum-pipeline
+        Topics: "edgex/events/device/+/+/+/randnum"
+        ExecutionOrder: "TransformJson, HTTPExportMeasurement"
+      mqtt-connection-status:
+        Id: mqtt-connection-status-pipeline
+        Topics: "edgex/events/device/+/+/+/mqtt-connection-status"
+        ExecutionOrder: "TransformJson, HTTPExportMQTTConnectionStatus"
+    Functions:
+      TransformJson:
+        Parameters:
+          Type: json
+      HTTPExportMeasurement:
+        Parameters:
+          Method: post
+          MimeType: application/json
+          Url: "http://my.api1.net/edgexdata"
+      HTTPExportMQTTConnectionStatus:
+        Parameters:
+          Method: post
+          MimeType: application/json
+          Url: "http://my.api2.net/edgexdata"
+
+Service:
+  Host: "localhost"
+  Port: 59700
+  StartupMsg: "app-sample has Started"
+
+MessageBus:
+  Disabled: false # Set to true if not using edgex-messagebus Trigger below and don't want Metrics
+  Optional:
+    ClientId: "app-sample"
+
+Trigger:
+  PublishTopic: "sample"
