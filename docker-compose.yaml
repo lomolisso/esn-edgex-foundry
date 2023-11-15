@@ -26,7 +26,6 @@ services:
       EDGEX_CONFIG_DIR: "/config"
       WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTMQTTCONNECTIONSTATUS_PARAMETERS_URL: "${EDGE_SENSOR_CONNECTION_STATUS_ENDPOINT}"
       WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTMEASUREMENT_PARAMETERS_URL: "${EDGE_SENSOR_MEASUREMENTS_ENDPOINT}"
-      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTTEST_PARAMETERS_URL: "${EDGE_SENSOR_TOPIC_TEST}"
 
     hostname: edgex-app-sample
     image: nexus3.edgexfoundry.org:10004/app-service-configurable-arm64:latest
@@ -297,6 +296,8 @@ services:
       EDGEX_SECURITY_SECRET_STORE: "false"
       MQTTBROKERINFO_HOST: edgex-mqtt-broker
       SERVICE_HOST: edgex-device-mqtt
+      DEVICE_DEVICESDIR: /config/devices
+      DEVICE_PROFILESDIR: /config/profiles
     hostname: edgex-device-mqtt
     image: nexus3.edgexfoundry.org:10004/device-mqtt-arm64:latest
     networks:
@@ -319,6 +320,7 @@ services:
         read_only: true
         bind:
           create_host_path: true
+      - ./edgex-config/device-mqtt:/config
   mqtt-broker:
     command:
       - /usr/sbin/mosquitto
@@ -396,6 +398,7 @@ services:
         source: kuiper-plugins
         target: /kuiper/plugins
         volume: {}
+      
   support-notifications:
     container_name: edgex-support-notifications
     depends_on:
