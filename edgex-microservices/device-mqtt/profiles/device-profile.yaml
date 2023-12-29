@@ -1,0 +1,94 @@
+name: "edge-sensor-device-profile"
+manufacturer: "Espressif Systems"
+model: "ESP32"
+description: "A device profile for an ESP32 based edge sensor"
+labels:
+  - "mqtt"
+
+deviceResources:
+  - name: measurement
+    isHidden: true
+    description: "edge sensor measurement"
+    properties:
+      valueType: "Float32"
+      readWrite: "R"
+  - name: prediction
+    isHidden: true
+    description: "edge sensor prediction"
+    properties:
+      valueType: "Float32"
+      readWrite: "R"
+  - name: predictive-model-size
+    isHidden: true
+    description: "predictive model size in bytes"
+    properties:
+      valueType: "Uint32"
+      readWrite: "W"
+      defaultValue: false
+  - name: predictive-model-b64
+    isHidden: true
+    description: "predictive model encoded in Base64"
+    properties:
+      valueType: "String"
+      readWrite: "W"
+  - name: config-measurement-interval-ms
+    isHidden: true
+    description: "measurement interval in milliseconds"
+    properties:
+      valueType: "Uint32"
+      readWrite: "W"
+  - name: request-pending-commands
+    isHidden: true
+    description: "request for the number of pending commands"
+    properties:
+      valueType: "Uint8"
+      readWrite: "R"
+  - name: response-pending-commands
+    isHidden: true
+    description: "number of pending commands"
+    properties:
+      valueType: "Uint8"
+      readWrite: "W"
+  - name: state-machine-ready
+    isHidden: false
+    description: "sets the edge sensor as ready to work"
+    properties:
+      valueType: "Bool"
+      readWrite: "W"
+  - name: state-machine-start
+    isHidden: false
+    description: "starts the edge sensor"
+    properties:
+      valueType: "Bool"
+      readWrite: "W"
+  - name: state-machine-stop
+    isHidden: false
+    description: "stops the edge sensor"
+    properties:
+      valueType: "Bool"
+      readWrite: "W"
+  - name: state-machine-reset
+    isHidden: false
+    description: "resets the edge sensor"
+    properties:
+      valueType: "Bool"
+      readWrite: "W"
+
+deviceCommands:
+  - name: edge-sensor-predictive-model
+    readWrite: "W"
+    isHidden: false
+    resourceOperations:
+        - { deviceResource: "predictive-model-size" }
+        - { deviceResource: "predictive-model-b64" }
+  - name: edge-sensor-config
+    readWrite: "W"
+    isHidden: false
+    resourceOperations:
+        - { deviceResource: "config-measurement-interval-ms" }
+  - name: edge-sensor-export-data
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+        - { deviceResource: "measurement" }
+        - { deviceResource: "prediction" }

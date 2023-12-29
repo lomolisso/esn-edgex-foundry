@@ -1,3 +1,4 @@
 .env
 mqtt-scripts/
 .DS_Store
+.vscode

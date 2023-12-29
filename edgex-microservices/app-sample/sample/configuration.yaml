@@ -4,28 +4,28 @@ Writable:
     Enabled: false
   Pipeline:
     PerTopicPipelines:
-      randnum:
-        Id: randnum-pipeline
-        Topics: "edgex/events/device/+/+/+/randnum"
-        ExecutionOrder: "TransformJson, HTTPExportMeasurement"
-      mqtt-connection-status:
-        Id: mqtt-connection-status-pipeline
-        Topics: "edgex/events/device/+/+/+/mqtt-connection-status"
-        ExecutionOrder: "TransformJson, HTTPExportMQTTConnectionStatus"
+      export-data:
+        Id: export-data-pipeline
+        Topics: "edgex/events/device/+/+/+/edge-sensor-export-data"
+        ExecutionOrder: "TransformJson, HTTPExportData"
+      request-pending-commands:
+        Id: request-pending-commands-pipeline
+        Topics: "edgex/events/device/+/+/+/request-pending-commands"
+        ExecutionOrder: "TransformJson, HTTPExportCommandRequest"
     Functions:
       TransformJson:
         Parameters:
           Type: json
-      HTTPExportMeasurement:
+      HTTPExportData:
         Parameters:
           Method: post
           MimeType: application/json
           Url: "http://my.api1.net/edgexdata"
-      HTTPExportMQTTConnectionStatus:
+      HTTPExportCommandRequest:
         Parameters:
           Method: post
           MimeType: application/json
-          Url: "http://my.api2.net/edgexdata"
+          Url: "http://my.api3.net/edgexdata"
 
 Service:
   Host: "localhost"

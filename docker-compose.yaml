@@ -24,8 +24,8 @@ services:
       TRIGGER_EDGEXMESSAGEBUS_PUBLISHHOST_HOST: edgex-redis
       TRIGGER_EDGEXMESSAGEBUS_SUBSCRIBEHOST_HOST: edgex-redis
       EDGEX_CONFIG_DIR: "/config"
-      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTMQTTCONNECTIONSTATUS_PARAMETERS_URL: "${EDGE_SENSOR_CONNECTION_STATUS_ENDPOINT}"
-      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTMEASUREMENT_PARAMETERS_URL: "${EDGE_SENSOR_MEASUREMENTS_ENDPOINT}"
+      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTDATA_PARAMETERS_URL: "${EDGE_SENSOR_EXPORT_DATA_ENDPOINT}"
+      WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTCOMMANDREQUEST_PARAMETERS_URL: "${EDGE_SENSOR_PENDING_COMMANDS_ENDPOINT}"
 
     hostname: edgex-app-sample
     image: nexus3.edgexfoundry.org:10004/app-service-configurable-arm64:latest
@@ -50,41 +50,6 @@ services:
         bind:
           create_host_path: true
       - ./edgex-config/app-sample:/config
-  app-rules-engine:
-    container_name: edgex-app-rules-engine
-    depends_on:
-      consul:
-        condition: service_started
-        required: true
-      core-data:
-        condition: service_started
-        required: true
-    environment:
-      EDGEX_PROFILE: rules-engine
-      EDGEX_SECURITY_SECRET_STORE: "false"
-      SERVICE_HOST: edgex-app-rules-engine
-    hostname: edgex-app-rules-engine
-    image: nexus3.edgexfoundry.org:10004/app-service-configurable-arm64:latest
-    networks:
-      edgex-network: null
-    ports:
-      - mode: ingress
-        host_ip: 127.0.0.1
-        target: 59701
-        published: "59701"
-        protocol: tcp
-    read_only: true
-    restart: always
-    security_opt:
-      - no-new-privileges:true
-    user: 2002:2001
-    volumes:
-      - type: bind
-        source: /etc/localtime
-        target: /etc/localtime
-        read_only: true
-        bind:
-          create_host_path: true
   consul:
     command:
       - agent
@@ -325,7 +290,7 @@ services:
     command:
       - /usr/sbin/mosquitto
       - -c
-      - /mosquitto-no-auth.conf
+      - /mosquitto.conf
     container_name: edgex-mqtt-broker
     hostname: edgex-mqtt-broker
     image: eclipse-mosquitto:2.0
@@ -333,7 +298,7 @@ services:
       edgex-network: null
     ports:
       - mode: ingress
-        host_ip: 127.0.0.1
+        host_ip: 0.0.0.0
         target: 1883
         published: "1883"
         protocol: tcp
@@ -342,6 +307,8 @@ services:
     security_opt:
       - no-new-privileges:true
     user: 2002:2001
+    volumes:
+      - ./edgex-config/mqtt-broker/mosquitto.conf:/mosquitto.conf
   rules-engine:
     container_name: edgex-kuiper
     depends_on:
@@ -361,7 +328,7 @@ services:
       KUIPER__BASIC__CONSOLELOG: "true"
       KUIPER__BASIC__RESTPORT: "59720"
     hostname: edgex-kuiper
-    image: lfedge/ekuiper:1.11-alpine
+    image: lfedge/ekuiper:1.11-slim-python
     networks:
       edgex-network: null
     ports:
