@@ -1,3 +1,4 @@
 .env
 .DS_Store
 .vscode
+edgex-config/rules-engine/tflite-plugin/venv

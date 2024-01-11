@@ -1,7 +1,7 @@
 name: edgex
 services:
-  app-sample:
-    container_name: edgex-app-sample
+  app-export:
+    container_name: edgex-app-export
     depends_on:
       consul:
         condition: service_started
@@ -10,8 +10,8 @@ services:
         condition: service_started
         required: true
     environment:
-      EDGEX_PROFILE: sample
-      SERVICE_HOST: edgex-app-sample
+      EDGEX_PROFILE: export
+      SERVICE_HOST: edgex-app-export
       EDGEX_SECURITY_SECRET_STORE: "false"
       CLIENTS_CORE_COMMAND_HOST: edgex-core-command
       CLIENTS_CORE_DATA_HOST: edgex-core-data
@@ -27,7 +27,7 @@ services:
       WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTDATA_PARAMETERS_URL: "${EDGE_SENSOR_EXPORT_DATA_ENDPOINT}"
       WRITABLE_PIPELINE_FUNCTIONS_HTTPEXPORTCOMMANDREQUEST_PARAMETERS_URL: "${EDGE_SENSOR_PENDING_COMMANDS_ENDPOINT}"
 
-    hostname: edgex-app-sample
+    hostname: edgex-app-export
     image: nexus3.edgexfoundry.org:10004/app-service-configurable-arm64:latest
     networks:
       edgex-network: null
@@ -49,7 +49,7 @@ services:
         read_only: true
         bind:
           create_host_path: true
-      - ./edgex-config/app-sample:/config
+      - ./edgex-config/app-export:/config
   consul:
     command:
       - agent
@@ -309,62 +309,6 @@ services:
     user: 2002:2001
     volumes:
       - ./edgex-config/mqtt-broker/mosquitto.conf:/mosquitto.conf
-  rules-engine:
-    container_name: edgex-kuiper
-    depends_on:
-      database:
-        condition: service_started
-        required: true
-    environment:
-      CONNECTION__EDGEX__REDISMSGBUS__PORT: "6379"
-      CONNECTION__EDGEX__REDISMSGBUS__PROTOCOL: redis
-      CONNECTION__EDGEX__REDISMSGBUS__SERVER: edgex-redis
-      CONNECTION__EDGEX__REDISMSGBUS__TYPE: redis
-      EDGEX__DEFAULT__PORT: "6379"
-      EDGEX__DEFAULT__PROTOCOL: redis
-      EDGEX__DEFAULT__SERVER: edgex-redis
-      EDGEX__DEFAULT__TOPIC: edgex/rules-events
-      EDGEX__DEFAULT__TYPE: redis
-      KUIPER__BASIC__CONSOLELOG: "true"
-      KUIPER__BASIC__RESTPORT: "59720"
-    hostname: edgex-kuiper
-    image: lfedge/ekuiper:1.11-slim-python
-    networks:
-      edgex-network: null
-    ports:
-      - mode: ingress
-        host_ip: 127.0.0.1
-        target: 59720
-        published: "59720"
-        protocol: tcp
-    read_only: true
-    restart: always
-    security_opt:
-      - no-new-privileges:true
-    volumes:
-      - type: bind
-        source: /etc/localtime
-        target: /etc/localtime
-        read_only: true
-        bind:
-          create_host_path: true
-      - type: volume
-        source: kuiper-data
-        target: /kuiper/data
-        volume: {}
-      - type: volume
-        source: kuiper-etc
-        target: /kuiper/etc
-        volume: {}
-      - type: volume
-        source: kuiper-log
-        target: /kuiper/log
-        volume: {}
-      - type: volume
-        source: kuiper-plugins
-        target: /kuiper/plugins
-        volume: {}
-      
   support-notifications:
     container_name: edgex-support-notifications
     depends_on:
