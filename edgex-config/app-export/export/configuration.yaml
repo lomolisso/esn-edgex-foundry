@@ -6,12 +6,24 @@ Writable:
     PerTopicPipelines:
       export-data:
         Id: export-data-pipeline
-        Topics: "edgex/events/device/+/+/+/edge-sensor-export-data"
+        Topics: "edgex/events/device/+/+/+/export-data"
         ExecutionOrder: "TransformJson, HTTPExportData"
       request-pending-commands:
         Id: request-pending-commands-pipeline
         Topics: "edgex/events/device/+/+/+/request-pending-commands"
         ExecutionOrder: "TransformJson, HTTPExportCommandRequest"
+      debug-prediction-log:
+        Id: debug-prediction-log-pipeline
+        Topics: "edgex/events/device/+/+/+/debug-prediction-log"
+        ExecutionOrder: "TransformJson, HTTPExportPredictionLog"
+      cloud-prediction-request:
+        Id: cloud-prediction-request-pipeline
+        Topics: "edgex/events/device/+/+/+/cloud-prediction-request"
+        ExecutionOrder: "TransformJson, HTTPExportCloudPredictionRequest"
+      gateway-prediction-request:
+        Id: gateway-prediction-request-pipeline
+        Topics: "edgex/events/device/+/+/+/gateway-prediction-request"
+        ExecutionOrder: "TransformJson, HTTPExportGatewayPredictionRequest"
     Functions:
       TransformJson:
         Parameters:
@@ -22,6 +34,21 @@ Writable:
           MimeType: application/json
           Url: "http://my.api1.net/edgexdata"
       HTTPExportCommandRequest:
+        Parameters:
+          Method: post
+          MimeType: application/json
+          Url: "http://my.api3.net/edgexdata"
+      HTTPExportPredictionLog:
+        Parameters:
+          Method: post
+          MimeType: application/json
+          Url: "http://my.api3.net/edgexdata"
+      HTTPExportCloudPredictionRequest:
+        Parameters:
+          Method: post
+          MimeType: application/json
+          Url: "http://my.api3.net/edgexdata"
+      HTTPExportGatewayPredictionRequest:
         Parameters:
           Method: post
           MimeType: application/json

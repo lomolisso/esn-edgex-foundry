@@ -12,31 +12,57 @@ deviceResources:
     properties:
       valueType: "Float32"
       readWrite: "R"
+
+  # timestamps for request/response interactions
+  - name: request-timestamp
+    isHidden: true
+    description: "A timestamp taken just before the device requests something"
+    properties:
+      valueType: "String"
+      readWrite: "R"
+  - name: response-timestamp
+    isHidden: true
+    description: "A timestamp taken just after a device receives a response"
+    properties:
+      valueType: "String"
+      readWrite: "R"
+
+  # debug resources for the edge sensor
+  - name: debug-mode
+    isHidden: true
+    description: "debug mode"
+    properties:
+      valueType: "Bool"
+      readWrite: "R"
+  - name: debug-prediction-command
+    isHidden: False
+    description: "prediction command"
+    properties:
+      valueType: "Object"
+      readWrite: "W"
+
+  # predictive model resources
+  - name: device-predictive-model
+    isHidden: false
+    description: "predictive model"
+    properties:
+      valueType: "Object"
+      readWrite: "W"
+      defaultValue: false
   - name: prediction
     isHidden: true
     description: "edge sensor prediction"
     properties:
       valueType: "Float32"
       readWrite: "R"
-  - name: predictive-model-size
+  - name: pred-source-layer
     isHidden: true
-    description: "predictive model size in bytes"
-    properties:
-      valueType: "Uint32"
-      readWrite: "W"
-      defaultValue: false
-  - name: predictive-model-b64
-    isHidden: true
-    description: "predictive model encoded in Base64"
+    description: "defines the source layer of the prediction"
     properties:
       valueType: "String"
-      readWrite: "W"
-  - name: config-measurement-interval-ms
-    isHidden: true
-    description: "measurement interval in milliseconds"
-    properties:
-      valueType: "Uint32"
-      readWrite: "W"
+      readWrite: "R"
+
+  # enqueued device resources
   - name: request-pending-commands
     isHidden: true
     description: "request for the number of pending commands"
@@ -48,6 +74,14 @@ deviceResources:
     description: "number of pending commands"
     properties:
       valueType: "Uint8"
+      readWrite: "W"
+      
+  # device state machine resources
+  - name: device-config
+    isHidden: true
+    description: "edge sensor configuration"
+    properties:
+      valueType: "Object"
       readWrite: "W"
   - name: state-machine-ready
     isHidden: false
@@ -75,20 +109,34 @@ deviceResources:
       readWrite: "W"
 
 deviceCommands:
-  - name: edge-sensor-predictive-model
-    readWrite: "W"
-    isHidden: false
-    resourceOperations:
-        - { deviceResource: "predictive-model-size" }
-        - { deviceResource: "predictive-model-b64" }
-  - name: edge-sensor-config
-    readWrite: "W"
-    isHidden: false
-    resourceOperations:
-        - { deviceResource: "config-measurement-interval-ms" }
-  - name: edge-sensor-export-data
+  - name: export-data
     readWrite: "R"
     isHidden: false
     resourceOperations:
-        - { deviceResource: "measurement" }
-        - { deviceResource: "prediction" }
+      - { deviceResource: "measurement" }
+
+  - name: cloud-prediction-request
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "request-timestamp" }
+      - { deviceResource: "debug-mode" }
+      - { deviceResource: "measurement" }
+
+  - name: gateway-prediction-request
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "request-timestamp" }
+      - { deviceResource: "debug-mode" }
+      - { deviceResource: "measurement" }
+
+  - name: debug-prediction-log
+    readWrite: "R"
+    isHidden: false
+    resourceOperations:
+      - { deviceResource: "pred-source-layer" }
+      - { deviceResource: "request-timestamp" }
+      - { deviceResource: "response-timestamp" }
+      - { deviceResource: "measurement" }
+      - { deviceResource: "prediction" }
